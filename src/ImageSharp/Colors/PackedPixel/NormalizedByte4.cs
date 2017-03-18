@@ -12,7 +12,7 @@ namespace ImageSharp
     /// <summary>
     /// Packed pixel type containing four 8-bit signed normalized values, ranging from −1 to 1.
     /// </summary>
-    public struct NormalizedByte4 : IPackedPixel<uint>, IEquatable<NormalizedByte4>
+    public struct NormalizedByte4 : IPixel<NormalizedByte4>, IPackedVector<uint>
     {
         /// <summary>
         /// The maximum byte value.
@@ -50,7 +50,7 @@ namespace ImageSharp
             this.PackedValue = Pack(x, y, z, w);
         }
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
         public uint PackedValue { get; set; }
 
         /// <summary>

@@ -62,12 +62,12 @@ namespace ImageSharp.Formats
 
         /// <inheritdoc/>
         public void Encode<TColor>(Image<TColor> image, Stream stream)
-            where TColor : struct, IPackedPixel, IEquatable<TColor>
+            where TColor : struct, IPixel<TColor>
         {
             // Ensure that quality can be set but has a fallback.
-            if (image.Quality > 0)
+            if (image.MetaData.Quality > 0)
             {
-                this.Quality = image.Quality;
+                this.Quality = image.MetaData.Quality;
             }
 
             JpegEncoderCore encode = new JpegEncoderCore();

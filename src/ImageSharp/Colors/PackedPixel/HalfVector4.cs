@@ -12,7 +12,7 @@ namespace ImageSharp
     /// <summary>
     /// Packed pixel type containing four 16-bit floating-point values.
     /// </summary>
-    public struct HalfVector4 : IPackedPixel<ulong>, IEquatable<HalfVector4>
+    public struct HalfVector4 : IPixel<HalfVector4>, IPackedVector<ulong>
     {
         /// <summary>
         /// The maximum byte value.
@@ -46,7 +46,7 @@ namespace ImageSharp
             this.PackedValue = Pack(ref vector);
         }
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
         public ulong PackedValue { get; set; }
 
         /// <summary>

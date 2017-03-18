@@ -56,6 +56,11 @@ If you prefer, you can compile ImageSharp yourself (please do and help!), you'll
 - [Visual Studio 2015 with Update 3 (or above)](https://www.visualstudio.com/news/releasenotes/vs2015-update3-vs)
 - The [.NET Core 1.0 SDK Installer](https://www.microsoft.com/net/core#windows) - Non VSCode link.
 
+Alternatively on Linux you can use:
+
+- [Visual Studio Code](https://code.visualstudio.com/) with [C# Extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode.csharp)
+- [.Net Core 1.1](https://www.microsoft.com/net/core#linuxubuntu)
+
 To clone it locally click the "Clone in Windows" button above or run the following git commands.
 
 ```bash
@@ -74,6 +79,16 @@ Many `Image` methods are also fluent.
 
 Here's an example of the code required to resize an image using the default Bicubic resampler then turn the colors into their grayscale equivalent using the BT709 standard matrix.
 
+On platforms supporting netstandard 1.3+
+```csharp
+using (Image image = new Image("foo.jpg"))
+{
+    image.Resize(image.Width / 2, image.Height / 2)
+         .Grayscale()
+         .Save("bar.jpg"); // automatic encoder selected based on extension.
+}
+```
+on netstandard 1.1 - 1.2
 ```csharp
 using (FileStream stream = File.OpenRead("foo.jpg"))
 using (FileStream output = File.OpenWrite("bar.jpg"))

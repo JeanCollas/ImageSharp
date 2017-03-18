@@ -17,7 +17,7 @@ namespace ImageSharp
     /// This struct is fully mutable. This is done (against the guidelines) for the sake of performance,
     /// as it avoids the need to create new values for modification operations.
     /// </remarks>
-    public struct Argb : IPackedPixel<uint>, IEquatable<Argb>
+    public struct Argb : IPixel<Argb>, IPackedVector<uint>
     {
         /// <summary>
         /// The shift count for the blue component
@@ -342,9 +342,9 @@ namespace ImageSharp
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static uint Pack(ref Vector4 vector)
         {
-            vector = Vector4.Clamp(vector, Vector4.Zero, Vector4.One);
             vector *= MaxBytes;
             vector += Half;
+            vector = Vector4.Clamp(vector, Vector4.Zero, MaxBytes);
             return (uint)(((byte)vector.X << RedShift)
                         | ((byte)vector.Y << GreenShift)
                         | ((byte)vector.Z << BlueShift)

@@ -1,5 +1,5 @@
 {
-  "version": "1.0.0-alpha1-*",
+  "version": "1.0.0-alpha2-*",
   "title": "ImageSharp.Drawing.Paths",
   "description": "A cross-platform library for the processing of image files; written in C#",
   "authors": [
@@ -44,7 +44,7 @@
     "ImageSharp.Drawing": {
       "target": "project"
     },
-    "SixLabors.Shapes": "0.1.0-alpha0004",
+    "SixLabors.Shapes": "0.1.0-alpha0005",
     "StyleCop.Analyzers": {
       "version": "1.0.0",
       "type": "build"

@@ -126,13 +126,13 @@ namespace ImageSharp.Formats
         public byte Threshold { get; set; }
 
         /// <summary>
-        /// Encodes the image to the specified stream from the <see cref="ImageBase{TColor}"/>.
+        /// Encodes the image to the specified stream from the <see cref="Image{TColor}"/>.
         /// </summary>
         /// <typeparam name="TColor">The pixel format.</typeparam>
         /// <param name="image">The <see cref="ImageBase{TColor}"/> to encode from.</param>
         /// <param name="stream">The <see cref="Stream"/> to encode the image data to.</param>
-        public void Encode<TColor>(ImageBase<TColor> image, Stream stream)
-            where TColor : struct, IPackedPixel, IEquatable<TColor>
+        public void Encode<TColor>(Image<TColor> image, Stream stream)
+            where TColor : struct, IPixel<TColor>
         {
             Guard.NotNull(image, nameof(image));
             Guard.NotNull(stream, nameof(stream));
@@ -153,7 +153,7 @@ namespace ImageSharp.Formats
             stream.Write(this.chunkDataBuffer, 0, 8);
 
             // Ensure that quality can be set but has a fallback.
-            int quality = this.Quality > 0 ? this.Quality : image.Quality;
+            int quality = this.Quality > 0 ? this.Quality : image.MetaData.Quality;
             this.Quality = quality > 0 ? quality.Clamp(1, int.MaxValue) : int.MaxValue;
 
             // Set correct color type if the color count is 256 or less.
@@ -262,7 +262,7 @@ namespace ImageSharp.Formats
         /// <param name="stream">The <see cref="Stream"/> containing image data.</param>
         /// <param name="header">The <see cref="PngHeader"/>.</param>
         private void CollectIndexedBytes<TColor>(ImageBase<TColor> image, Stream stream, PngHeader header)
-            where TColor : struct, IPackedPixel, IEquatable<TColor>
+            where TColor : struct, IPixel<TColor>
         {
             // Quantize the image and get the pixels.
             QuantizedImage<TColor> quantized = this.WritePaletteChunk(stream, header, image);
@@ -277,7 +277,7 @@ namespace ImageSharp.Formats
         /// <param name="row">The row index.</param>
         /// <param name="rawScanline">The raw scanline.</param>
         private void CollectGrayscaleBytes<TColor>(PixelAccessor<TColor> pixels, int row, byte[] rawScanline)
-            where TColor : struct, IPackedPixel, IEquatable<TColor>
+            where TColor : struct, IPixel<TColor>
         {
             // Copy the pixels across from the image.
             // Reuse the chunk type buffer.
@@ -311,7 +311,7 @@ namespace ImageSharp.Formats
         /// <param name="row">The row index.</param>
         /// <param name="rawScanline">The raw scanline.</param>
         private void CollectColorBytes<TColor>(PixelAccessor<TColor> pixels, int row, byte[] rawScanline)
-            where TColor : struct, IPackedPixel, IEquatable<TColor>
+            where TColor : struct, IPixel<TColor>
         {
             // We can use the optimized PixelAccessor here and copy the bytes in unmanaged memory.
             using (PixelArea<TColor> pixelRow = new PixelArea<TColor>(this.width, rawScanline, this.bytesPerPixel == 4 ? ComponentOrder.Xyzw : ComponentOrder.Xyz))
@@ -332,7 +332,7 @@ namespace ImageSharp.Formats
         /// <param name="result">The filtered scanline result.</param>
         /// <returns>The <see cref="T:byte[]"/></returns>
         private byte[] EncodePixelRow<TColor>(PixelAccessor<TColor> pixels, int row, byte[] previousScanline, byte[] rawScanline, byte[] result)
-            where TColor : struct, IPackedPixel, IEquatable<TColor>
+            where TColor : struct, IPixel<TColor>
         {
             switch (this.PngColorType)
             {
@@ -486,7 +486,7 @@ namespace ImageSharp.Formats
         /// <param name="image">The image to encode.</param>
         /// <returns>The <see cref="QuantizedImage{TColor}"/></returns>
         private QuantizedImage<TColor> WritePaletteChunk<TColor>(Stream stream, PngHeader header, ImageBase<TColor> image)
-            where TColor : struct, IPackedPixel, IEquatable<TColor>
+            where TColor : struct, IPixel<TColor>
         {
             if (this.Quality > 256)
             {
@@ -495,7 +495,7 @@ namespace ImageSharp.Formats
 
             if (this.Quantizer == null)
             {
-                this.Quantizer = new WuQuantizer<TColor>();
+                this.Quantizer = new OctreeQuantizer<TColor>();
             }
 
             // Quantize the image returning a palette. This boxing is icky.
@@ -554,14 +554,14 @@ namespace ImageSharp.Formats
         /// <param name="stream">The <see cref="Stream"/> containing image data.</param>
         /// <param name="imageBase">The image base.</param>
         private void WritePhysicalChunk<TColor>(Stream stream, ImageBase<TColor> imageBase)
-            where TColor : struct, IPackedPixel, IEquatable<TColor>
+            where TColor : struct, IPixel<TColor>
         {
             Image<TColor> image = imageBase as Image<TColor>;
-            if (image != null && image.HorizontalResolution > 0 && image.VerticalResolution > 0)
+            if (image != null && image.MetaData.HorizontalResolution > 0 && image.MetaData.VerticalResolution > 0)
             {
                 // 39.3700787 = inches in a meter.
-                int dpmX = (int)Math.Round(image.HorizontalResolution * 39.3700787D);
-                int dpmY = (int)Math.Round(image.VerticalResolution * 39.3700787D);
+                int dpmX = (int)Math.Round(image.MetaData.HorizontalResolution * 39.3700787D);
+                int dpmY = (int)Math.Round(image.MetaData.VerticalResolution * 39.3700787D);
 
                 WriteInteger(this.chunkDataBuffer, 0, dpmX);
                 WriteInteger(this.chunkDataBuffer, 4, dpmY);
@@ -600,7 +600,7 @@ namespace ImageSharp.Formats
         /// <param name="pixels">The pixel accessor.</param>
         /// <param name="stream">The stream.</param>
         private void WriteDataChunks<TColor>(PixelAccessor<TColor> pixels, Stream stream)
-            where TColor : struct, IPackedPixel, IEquatable<TColor>
+            where TColor : struct, IPixel<TColor>
         {
             int bytesPerScanline = this.width * this.bytesPerPixel;
             byte[] previousScanline = new byte[bytesPerScanline];

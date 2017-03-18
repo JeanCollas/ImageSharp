@@ -33,8 +33,8 @@ namespace ImageSharp.Formats
 
         /// <inheritdoc/>
         public void Encode<TColor>(Image<TColor> image, Stream stream)
-        where TColor : struct, IPackedPixel, IEquatable<TColor>
-                {
+            where TColor : struct, IPixel<TColor>
+        {
             GifEncoderCore encoder = new GifEncoderCore
             {
                 Quality = this.Quality,

@@ -121,7 +121,7 @@ namespace ImageSharp
         /// The <see cref="Image{TColor}"/>.
         /// </returns>
         public Image<TColor> CreateThumbnail<TColor>()
-            where TColor : struct, IPackedPixel, IEquatable<TColor>
+            where TColor : struct, IPixel<TColor>
         {
             this.InitializeValues();
 
@@ -222,6 +222,26 @@ namespace ImageSharp
 
             ExifWriter writer = new ExifWriter(this.values, this.Parts);
             return writer.GetData();
+        }
+
+        /// <summary>
+        /// Synchronizes the profiles with the specified meta data.
+        /// </summary>
+        /// <param name="metaData">The meta data.</param>
+        internal void Sync(ImageMetaData metaData)
+        {
+            this.SyncResolution(ExifTag.XResolution, metaData.HorizontalResolution);
+            this.SyncResolution(ExifTag.YResolution, metaData.VerticalResolution);
+        }
+
+        private void SyncResolution(ExifTag tag, double resolution)
+        {
+            ExifValue value = this.GetValue(tag);
+            if (value != null)
+            {
+              Rational newResolution = new Rational(resolution, false);
+              this.SetValue(tag, newResolution);
+            }
         }
 
         private void InitializeValues()
