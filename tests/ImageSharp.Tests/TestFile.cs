@@ -131,6 +131,18 @@ namespace ImageSharp.Tests
         }
 
         /// <summary>
+        /// Creates a new image.
+        /// </summary>
+        /// <param name="options">The options for the decoder.</param>
+        /// <returns>
+        /// The <see cref="Image"/>.
+        /// </returns>
+        public Image CreateImage(IDecoderOptions options)
+        {
+            return new Image(this.Bytes, options);
+        }
+
+        /// <summary>
         /// Gets the correct path to the formats directory.
         /// </summary>
         /// <returns>
@@ -141,8 +153,9 @@ namespace ImageSharp.Tests
             List<string> directories = new List< string > {
                  "TestImages/Formats/", // Here for code coverage tests.
                   "tests/ImageSharp.Tests/TestImages/Formats/", // from travis/build script
-                  "../../../ImageSharp.Tests/TestImages/Formats/", // from Sandbox46
-                  "../../../../TestImages/Formats/"
+                  "../../../../../ImageSharp.Tests/TestImages/Formats/", // from Sandbox46
+                  "../../../../TestImages/Formats/",
+                  "../../../TestImages/Formats/"
             };
 
             directories = directories.SelectMany(x => new[]
@@ -152,7 +165,7 @@ namespace ImageSharp.Tests
 
             AddFormatsDirectoryFromTestAssebmlyPath(directories);
 
-            var directory = directories.FirstOrDefault(x => Directory.Exists(x));
+            string directory = directories.FirstOrDefault(x => Directory.Exists(x));
 
             if(directory  != null)
             {

@@ -17,7 +17,7 @@ namespace ImageSharp.Drawing.Processors
     /// </summary>
     /// <typeparam name="TColor">The type of the color.</typeparam>
     /// <seealso cref="ImageSharp.Processing.ImageProcessor{TColor}" />
-    public class DrawPathProcessor<TColor> : ImageProcessor<TColor>
+    internal class DrawPathProcessor<TColor> : ImageProcessor<TColor>
         where TColor : struct, IPixel<TColor>
     {
         private const float AntialiasFactor = 1f;
@@ -110,7 +110,6 @@ namespace ImageSharp.Drawing.Processors
                                 Vector4 sourceVector = color.Color.ToVector4();
 
                                 Vector4 finalColor = Vector4BlendTransforms.PremultipliedLerp(backgroundVector, sourceVector, opacity);
-                                finalColor.W = backgroundVector.W;
 
                                 TColor packed = default(TColor);
                                 packed.PackFromVector4(finalColor);
